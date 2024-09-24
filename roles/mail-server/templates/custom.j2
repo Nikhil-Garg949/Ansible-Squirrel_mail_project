@@ -1,0 +1,16 @@
+$TTL 1M
+@       IN SOA  @ rname.invalid. (
+                                        0       ; serial
+                                        1D      ; refresh
+                                        1H      ; retry
+                                        1W      ; expire
+                                        3H )    ; minimum
+
+@	IN	NS	{{name_server_1_with_domain_name}}
+@	IN	NS	{{name_server_2_with_domain_name}}
+{{name_server_1}}	IN	A	{{ip_address}}
+{{name_server_2}}       IN      A       {{ip_address}}
+@	IN	A	{{ip_address}}
+@	IN	MX	10	mail.{{domain_name}}
+{{search_name}}	IN	A	{{ip_address}}
+	

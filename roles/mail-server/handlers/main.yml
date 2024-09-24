@@ -1,0 +1,24 @@
+---
+ - name: restart dns server
+   service:
+     name: named
+     state: restarted
+     enabled: yes
+
+ - name: restart postfix package
+   service:
+     name: postfix.service
+     state: restarted
+     enabled: yes
+
+ - name: restart dovecot package
+   service:
+     name: dovecot.service
+     state: restarted
+     enabled: yes
+
+ - name: restart httpd server
+   service:
+     name: http
+     state: restarted
+     enabled: yes
