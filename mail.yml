@@ -1,0 +1,5 @@
+---
+ - name: configure a mail server
+   hosts: dev
+   roles:
+     - mail-server

@@ -1,0 +1,153 @@
+---
+ - name: Install package for mail server
+   yum:
+     name: "{{package_1}}"
+     state: present
+
+ - name: Set a dns server for the mail server
+   template:
+     src: named.conf.j2
+     dest: /etc/named.conf
+
+ - name: Adding file /var/named/$file_1 for the dns
+   template:
+     src: custom.j2
+     dest: "/var/named/{{file_1}}"
+   notify: restart dns server
+
+ - name: Now we are configure mail server so we are edit sime lines in postfix main configuration file
+   template:
+     src: main.cf.j2
+     dest: /etc/postfix/main.cf
+   notify: restart postfix package
+
+
+
+
+
+
+ - name: Import GPG key for EPEL and Remi repository
+   rpm_key:
+     key: https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-9
+     state: present
+
+ - name: Import GPG key for Remi repository
+   rpm_key:
+     key: https://rpms.remirepo.net/RPM-GPG-KEY-remi
+     state: present
+
+ - name: Configure the EPEL repository
+   yum:
+     name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
+     state: present
+
+ - name: Configure the Remi repository
+   yum:
+     name: https://rpms.remirepo.net/enterprise/remi-release-9.rpm
+     state: present      
+     disable_gpg_check: yes
+
+
+ - name: Installing Dovecot Package
+   yum:
+     name: dovecot
+     state: present
+
+ - name: Edit Dovecot configuration in /etc/dovecot/dovecot.conf
+   template:
+     src: dovecot.conf.j2
+     dest: /etc/dovecot/dovecot.conf
+
+ - name: Edit Dovecot configuration in /etc/dovecot/conf.d/10-mail.conf
+   template:
+     src: 10-mail.conf.j2
+     dest: /etc/dovecot/conf.d/10-mail.conf
+
+ - name: Edit Dovecot configuration in /etc/dovecot/conf.d/10-master.conf
+   template:
+     src: 10-master.conf.j2
+     dest: /etc/dovecot/conf.d/10-master.conf
+
+ - name: Edit Dovecot configuration in /etc/dovecot/conf.d/10-auth.conf
+   template:
+     src: 10-auth.conf.j2
+     dest: /etc/dovecot/conf.d/10-auth.conf
+   notify: restart dovecot package
+
+ - name: Configure GUI MUA squirrelmail so install required package for the squirrelmail
+   yum:
+     name:
+       - httpd
+       - perl
+       - tar
+       - wget
+       - php
+     state: present
+
+ - name: Enable Remi repository for PHP 7.4
+   command: 
+     dnf module enable php:remi-7.4 -y
+
+ - name: Download and extract a squirrelmail in /var/www/html location
+   get_url:
+     url: https://downloads.sourceforge.net/project/squirrelmail/stable/1.4.22/squirrelmail-webmail-1.4.22.tar.gz
+     dest: /var/www/html/squirrelmail-webmail-1.4.22.tar.gz
+     mode: '0644'
+
+
+# - name: Create extraction directory
+#   file:
+#    path: /var/www/html/squirrelmail-webmail
+#    state: directory
+
+
+ - name: Extract the downloaded file
+   unarchive:
+     src: /var/www/html/squirrelmail-webmail-1.4.22.tar.gz 
+     dest: /var/www/html
+     remote_src: yes 
+ 
+ - name: Delette the squirrelmail tar file
+   file: 
+     path: /var/www/html/squirrelmail-webmail-1.4.22.tar.gz
+     state: absent
+
+ - name: move the squirrelmail file in the /var/www/html directory
+   shell:
+     rsync -av --remove-source-files /var/www/html/squirrelmail-webmail-1.4.22/ /var/www/html/  
+
+ - name: Delete the file because we move all the file in the html
+   file:
+     path: /var/www/html/squirrelmail-webmail-1.4.22
+     state: absent
+  
+       #- name: create a config.php file
+       #file:
+     #path: /var/www/html/config/config.php
+       #state: touch
+ - name: Copy config_default.php to config.php
+   copy:
+     src: /var/www/html/config/config_default.php
+     dest: /var/www/html/config/config.php
+     remote_src: yes 
+     mode: '0644'
+
+
+ - name: Set organization name in SquirrelMail configuration
+   template:
+     src: config_default.php.j2
+     dest: /var/www/html/config/config_default.php
+
+
+
+ - name: Create /var/local
+   file:
+     path: /var/local/squirrelmail
+     state: directory
+
+ - name: Create /var/local/squirrelmail/data
+   file:
+     path: /var/local/squirrelmail/data
+     state: directory
+     owner: apache
+   notify: restart httpd server

@@ -1,0 +1,24 @@
+package_1: postfix, s-nail, bind, bind-utils
+
+# Give a file name for dns entry in ("/var/named/file_1") without any extension
+file_1: nikhil
+
+  # Give your name server with your domain name follow the example (eg: ns1.xyz.com.) for the dns setup in "/var/named/filr_name" 
+name_server_1_with_domain_name: ng1.ns3logic.com.
+name_server_2_with_domain_name: ng2.ns3logic.com.
+
+# Give a your domain name  
+domain_name: ns3logic.com
+
+# Give your both nameserver name for any domain website (eg: ng1,pn2,hs1)
+name_server_1: ng1
+name_server_2: ng2
+
+# Give your mail server IP ADDRESS
+ip_address: 15.206.164.225
+
+# Give your search name to our mail server (eg: mail.xyz.com)
+search_name: mail
+
+# Give your organization name for the mail sever 
+name_organization: ns3logic.com
